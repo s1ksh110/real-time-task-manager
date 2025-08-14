@@ -26,3 +26,27 @@ class RegisterSerializer(serializers.ModelSerializer):
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
+
+
+# ... (keep existing imports and RegisterView)
+
+from rest_framework import viewsets, permissions
+from .models import Task
+from .serializers import TaskSerializer
+
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True  # Anyone can read.
+        return obj.assigned_to == request.user  # Only owner can edit/delete.
+
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]  # Require login, owner check.
+
+    def perform_create(self, serializer):
+        serializer.save(assigned_to=self.request.user)  # Auto-assign to current user.
+
+    def get_queryset(self):
+        return Task.objects.filter(assigned_to=self.request.user)  # Only show user's tasks.
