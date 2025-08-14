@@ -1,13 +1,7 @@
-# Python cache
+venv/
 __pycache__/
 *.pyc
-
-# Virtual environment
-venv/
-
-# SQLite database
 db.sqlite3
-
-# OS files
-.DS_Store
-Thumbs.db
+*.log
+node_modules/
+.env
