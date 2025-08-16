@@ -33,6 +33,8 @@ class RegisterView(generics.CreateAPIView):
 from rest_framework import viewsets, permissions
 from .models import Task
 from .serializers import TaskSerializer
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -46,7 +48,15 @@ class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]  # Require login, owner check.
 
     def perform_create(self, serializer):
-        serializer.save(assigned_to=self.request.user)  # Auto-assign to current user.
+        task = serializer.save(assigned_to=self.request.user)
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'tasks',
+            {
+                'type': 'task_created',
+                'task': TaskSerializer(task).data
+            }
+        )
 
     def get_queryset(self):
         return Task.objects.filter(assigned_to=self.request.user)  # Only show user's tasks.

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',  # For DRF APIs.
     'tasks',  # Our custom app.
+    'channels',  # For WebSockets.
 ]
 
 # Middleware: Handles requests/responses (e.g., security, sessions).
@@ -100,4 +101,17 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',  # Require login for most views.
     ],
+}
+
+
+
+ASGI_APPLICATION = 'task_manager.asgi.application'  # For ASGI server.
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],  # Redis local.
+        },
+    },
 }
