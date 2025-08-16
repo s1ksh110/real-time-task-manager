@@ -115,3 +115,18 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis broker.
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BEAT_SCHEDULE = {
+    'send-reminders': {
+        'task': 'tasks.tasks.send_reminders',
+        'schedule': 60 * 60,  # Every hour (in seconds).
+    },
+}
+
+
+# Email settings for development
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints emails to console
+EMAIL_HOST_USER = 'no-reply@example.com'  # Dummy sender address

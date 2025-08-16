@@ -19,6 +19,8 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Auto-set on creation.
     updated_at = models.DateTimeField(auto_now=True)  # Auto-update on save.
     due_date = models.DateTimeField(null=True, blank=True)  # Optional due date for reminders.
+    completed = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.title  # Human-readable representation.
